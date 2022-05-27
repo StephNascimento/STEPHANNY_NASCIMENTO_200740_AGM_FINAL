@@ -19,11 +19,14 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import org.w3c.dom.Text;
+
 import java.util.Random;
 import java.util.SortedMap;
 
 public class MyGdxGame extends ApplicationAdapter {
 	Texture img;
+	//Variáveis das imagens do jogo
 	private SpriteBatch batch;
 	private Texture[] passaros;
 	private Texture fundo;
@@ -31,11 +34,13 @@ public class MyGdxGame extends ApplicationAdapter {
 	private Texture canoTopo;
 	private Texture gameOver;
 
+	//Colisores dos objetos
 	private ShapeRenderer shapeRenderer;
 	private Circle circuloPassaro;
 	private Rectangle retanguloCanoCima;
 	private Rectangle retanguloCanoBaixo;
 
+	//
 	private float larguraDispositivo;
 	private float alturaDispositivo;
 	private float variacao = 0;
@@ -51,16 +56,20 @@ public class MyGdxGame extends ApplicationAdapter {
 	private int estadoJogo = 0;
 	private float posicaoHorizontalPassaro = 0;
 
+	//
 	BitmapFont textoPontuacao;
 	BitmapFont textoReiniciar;
 	BitmapFont textoMelhorPontuacao;
 
+	//
 	Sound somVoando;
 	Sound somColisao;
 	Sound somPontuacao;
 
+	//
 	Preferences preferences;
 
+	//
 	private OrthographicCamera camera;
 	private Viewport viewport;
 	private final float VIRTUAL_WIDTH = 720;
@@ -76,8 +85,10 @@ public class MyGdxGame extends ApplicationAdapter {
 	//
 	@Override
 	public void render () {
+		//
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
+		//
 		verificarEstadoJogo();
 		validarPontos();
 		desenharTexturas();
@@ -87,10 +98,11 @@ public class MyGdxGame extends ApplicationAdapter {
 	//Método está chamando todas as texturas
 	private void inicializarTexturas(){
 		passaros = new Texture[3];
-		passaros[0] = new Texture("passaro1.png");
-		passaros[1] = new Texture("passaro2.png");
-		passaros[2] = new Texture("passaro3.png");
+		passaros[0] = new Texture("angrybird_1.png");
+		passaros[1] = new Texture("angrybird_2.png");
+		passaros[2] = new Texture("angrybird_1.png");
 
+		//
 		fundo = new Texture("fundo.png");
 		canoBaixo = new Texture("cano_baixo_maior.png");
 		canoTopo = new Texture("cano_topo_maior.png");
@@ -99,39 +111,48 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	//Método está inicializando todos os objetos que pertecem o jogo
 	private void inicializarObjetos(){
+		//
 		batch = new SpriteBatch();
 		random = new Random();
 
+		//
 		larguraDispositivo = VIRTUAL_WIDTH;
 		alturaDispositivo = VIRTUAL_HEIGHT;
 		posicaoInicialVerticalPassaro = alturaDispositivo / 2;
 		posicaoCanoHorizontal = larguraDispositivo;
 		espacoEntreCanos = 350;
 
+		//
 		textoPontuacao = new BitmapFont();
 		textoPontuacao.setColor(Color.WHITE);
 		textoPontuacao.getData().setScale(10);
 
+		//
 		textoReiniciar = new BitmapFont();
 		textoReiniciar.setColor(Color.GREEN);
 		textoReiniciar.getData().setScale(2);
 
+		//
 		textoMelhorPontuacao = new BitmapFont();
 		textoMelhorPontuacao.setColor(Color.RED);
 		textoMelhorPontuacao.getData().setScale(2);
 
+		//
 		shapeRenderer = new ShapeRenderer();
 		circuloPassaro = new Circle();
 		retanguloCanoBaixo = new Rectangle();
 		retanguloCanoCima = new Rectangle();
 
+		//
 		somVoando = Gdx.audio.newSound(Gdx.files.internal("som_asa.wav"));
 		somColisao = Gdx.audio.newSound(Gdx.files.internal("som_batida.wav"));
 		somPontuacao = Gdx.audio.newSound(Gdx.files.internal("som_pontos.wav"));
 
+		//
 		preferences = Gdx.app.getPreferences("flappyBird");
 		pontuacaoMaxima = preferences.getInteger("pontuacaoMaxima", 0);
 
+		//
 		camera = new OrthographicCamera();
 		camera.position.set(VIRTUAL_WIDTH/2, VIRTUAL_HEIGHT/2,0);
 		viewport = new StretchViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera);
@@ -139,50 +160,51 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	//Verificando em que estado o jogador se encontra no jogo
 	private void verificarEstadoJogo(){
+
+		//
 		boolean toqueTela = Gdx.input.justTouched();
 
-		//Se ele tocar na tela irá alterar a gravidade e ativar o som de voando
-		//E passará o jogador para o estado de jogo
-		if(estadoJogo == 0){
-			if(toqueTela){
+		//
+		if (estadoJogo == 0) {
+			if (toqueTela) {
 				gravidade = -15;
 				estadoJogo = 1;
 				somVoando.play();
 			}
-		}
 
-		//Processo enquanto o jogador está jogando
-		else if(estadoJogo == 1){
-			if(toqueTela){
+		//
+		}else if(estadoJogo == 1) {
+			if (toqueTela) {
 				gravidade = -15;
 				somVoando.play();
 			}
-		}
 
-		posicaoCanoHorizontal -= Gdx.graphics.getDeltaTime() * 200;
+			posicaoCanoHorizontal -= Gdx.graphics.getDeltaTime() * 200;
 
-		if(posicaoCanoHorizontal < -canoTopo.getWidth()){
-			posicaoCanoHorizontal = larguraDispositivo;
-			posicaoCanoVertical = random.nextInt(400) - 200;
-			passouCano = false;
-		}
+			//
+			if (posicaoCanoHorizontal < -canoTopo.getWidth()) {
+				posicaoCanoHorizontal = larguraDispositivo;
+				posicaoCanoVertical = random.nextInt(400) - 200;
+				passouCano = false;
+			}
 
-		if(posicaoInicialVerticalPassaro > 0 || toqueTela) {
-			posicaoInicialVerticalPassaro = posicaoInicialVerticalPassaro - gravidade;
-			gravidade++;
-		}
+			//
+			if (posicaoInicialVerticalPassaro > 0 || toqueTela) {
+				posicaoInicialVerticalPassaro = posicaoInicialVerticalPassaro - gravidade;
+				gravidade++;
+			}
 
-		//Estado aonde o jogador acabou colidindo em algum cano
-		//Mostra a pontuação dele e permite reiniciar o jogo
-		else if(estadoJogo == 2){
-			if(pontos > pontuacaoMaxima){
+		//
+		}else if (estadoJogo == 2){
+			if (pontos > pontuacaoMaxima){
 				pontuacaoMaxima = pontos;
 				preferences.putInteger("pontuacaoMaxima", pontuacaoMaxima);
 				preferences.flush();
 			}
-			posicaoHorizontalPassaro -= Gdx.graphics.getDeltaTime() * 500;
+			posicaoHorizontalPassaro -= Gdx.graphics.getDeltaTime()*500;
 
-			if(toqueTela){
+			//
+			if (toqueTela){
 				estadoJogo = 0;
 				pontos = 0;
 				gravidade = 0;
@@ -195,28 +217,33 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	//Método onde detecta as colisões e passa para o estado "2"
 	private void detectarColisoes(){
+		//
 		circuloPassaro.set(
 				50 + posicaoHorizontalPassaro + passaros[0].getWidth() / 2,
 				posicaoInicialVerticalPassaro + passaros[0].getHeight() / 2,
 				passaros[0].getWidth() / 2
 		);
 
+		//
 		retanguloCanoBaixo.set(
 				posicaoCanoHorizontal,
 				alturaDispositivo / 2 - canoBaixo.getHeight() - espacoEntreCanos / 2 + posicaoCanoVertical,
 				canoBaixo.getWidth(), canoBaixo.getHeight()
 		);
 
+		//
 		retanguloCanoCima.set(
 				posicaoCanoHorizontal, alturaDispositivo / 2 + espacoEntreCanos / 2 + posicaoCanoVertical,
 				canoTopo.getWidth(), canoTopo.getHeight()
 		);
 
+		//
 		boolean colidiuCanoCima = Intersector.overlaps(circuloPassaro, retanguloCanoCima);
 		boolean colidiuCanoBaixo = Intersector.overlaps(circuloPassaro, retanguloCanoBaixo);
 
-		if(colidiuCanoCima || colidiuCanoBaixo){
-			if(estadoJogo == 1){
+		//
+		if (colidiuCanoCima || colidiuCanoBaixo){
+			if (estadoJogo == 1){
 				somColisao.play();
 				estadoJogo = 2;
 			}
@@ -225,24 +252,30 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	//Método faz aparecer os assets do jogo na tela do jogador
 	private void desenharTexturas(){
+		//
 		batch.setProjectionMatrix(camera.combined);
+		//
 		batch.begin();
+		//
 		batch.draw(fundo, 0, 0, larguraDispositivo, alturaDispositivo);
 		batch.draw(passaros[(int) variacao], 50 + posicaoHorizontalPassaro, posicaoInicialVerticalPassaro);
 		batch.draw(canoBaixo,posicaoCanoHorizontal,alturaDispositivo/2-canoBaixo.getHeight()-espacoEntreCanos/2+posicaoCanoVertical);
 		batch.draw(canoTopo,posicaoCanoHorizontal,alturaDispositivo/2+espacoEntreCanos/2+posicaoCanoVertical);
 		textoPontuacao.draw(batch,String.valueOf(pontos),larguraDispositivo/2,alturaDispositivo -110);
 
+		//
 		if(estadoJogo == 2){
 			batch.draw(gameOver,larguraDispositivo/2 - gameOver.getWidth()/2,alturaDispositivo/2);
 			textoReiniciar.draw(batch,"Toque para reiniciar!",larguraDispositivo/2 - 140,alturaDispositivo/2 - gameOver.getHeight()/2);
 			textoMelhorPontuacao.draw(batch,"Seu record é "+pontuacaoMaxima+" pontos",larguraDispositivo/2 - 140,alturaDispositivo/2-gameOver.getHeight());
 		}
+		//
 		batch.end();
 	}
 
 	//Método está validando os pontos do jogador toda vez que ele passa pelos canos
 	public void validarPontos(){
+		//
 		if(posicaoCanoHorizontal < 50-passaros[0].getWidth()){
 			if(!passouCano){
 				pontos++;
@@ -253,16 +286,19 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		variacao += Gdx.graphics.getDeltaTime() * 10;
 
+		//
 		if(variacao > 3){
 			variacao = 0;
 		}
 	}
 
+	//
 	@Override
 	public void resize(int width,int height){
 		viewport.update(width, height);
 	}
 
+	//
 	@Override
 	public void dispose () {
 		batch.dispose();
